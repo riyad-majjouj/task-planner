@@ -6,8 +6,6 @@ const PwaMetaTags = () => {
         document.title = "منظم المهام الأسبوعي";
         const setMeta = (name, content) => { let element = document.querySelector(`meta[name=${name}]`) || document.createElement('meta'); element.name = name; element.content = content; document.head.appendChild(element); };
         const setLink = (rel, href) => { let element = document.querySelector(`link[rel=${rel}]`) || document.createElement('link'); element.rel = rel; element.href = href; document.head.appendChild(element); };
-        
-        // ** تم إزالة السطر المكرر **
         setMeta('theme-color', '#3b82f6');
         setMeta('apple-mobile-web-app-status-bar-style', 'black-translucent');
         setMeta('apple-mobile-web-app-title', 'منظم المهام');
@@ -30,7 +28,7 @@ const MoonIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w
 const SparklesIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 2a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 2zM5.105 5.105a.75.75 0 011.06 0l2.475 2.475a.75.75 0 01-1.06 1.06L5.105 6.165a.75.75 0 010-1.06zm9.79 0a.75.75 0 010 1.06l-2.475 2.475a.75.75 0 01-1.06-1.06l2.475-2.475a.75.75 0 011.06 0zM10 18a.75.75 0 01-.75-.75v-3.5a.75.75 0 011.5 0v3.5A.75.75 0 0110 18zM6.165 14.895a.75.75 0 010-1.06l2.475-2.475a.75.75 0 011.06 1.06L7.225 14.895a.75.75 0 01-1.06 0zM14.895 13.835a.75.75 0 011.06 0l2.475 2.475a.75.75 0 01-1.06 1.06L14.895 14.895a.75.75 0 010-1.06zM2 10a.75.75 0 01.75-.75h3.5a.75.75 0 010 1.5h-3.5A.75.75 0 012 10zm14.5 0a.75.75 0 01.75-.75h3.5a.75.75 0 010 1.5h-3.5a.75.75 0 01-.75-.75z" clipRule="evenodd" /></svg>);
 const ClockIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.414L11 10.586V6z" clipRule="evenodd" /></svg>);
 const CalendarIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" /></svg>);
-const InstallIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>);
+const InstallIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>);
 
 const timeSlots = Array.from({ length: 24 * 4 }, (_, i) => { const totalMinutes = i * 15; const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; const label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`; const value = hours + minutes / 60; return { label, value }; });
 const durationOptions = [ { label: '15 دقيقة', value: 0.25 }, { label: '30 دقيقة', value: 0.5 }, { label: '45 دقيقة', value: 0.75 }, { label: 'ساعة واحدة', value: 1 }, { label: 'ساعة و 30 دقيقة', value: 1.5 }, { label: 'ساعتان', value: 2 }, { label: '3 ساعات', value: 3 }, { label: '4 ساعات', value: 4 }, ];
@@ -100,9 +98,25 @@ export default function App() {
     const resetTasks = () => { if (window.confirm('هل أنت متأكد من أنك تريد حذف جميع المهام؟')) setTasks([]); };
     const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
-    const generateSmartDescription = async () => { /* ... الكود كما هو ... */ };
+    const generateSmartDescription = async () => {
+        if (!editingTask?.title) { alert("الرجاء إدخال عنوان للمهمة أولاً."); return; }
+        setIsGenerating(true);
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        const systemPrompt = "You are a helpful productivity assistant. Your goal is to help users flesh out their tasks. You must respond in Arabic.";
+        const userQuery = `Based on the task title, generate a short, helpful description. If complex, break it into 2-3 simple steps with bullet points. Be concise and actionable. Task Title: "${editingTask.title}"`;
+        const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, };
+        try {
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`API call failed: ${response.status}`);
+            const result = await response.json();
+            const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (generatedText) setEditingTask(prev => ({ ...prev, description: generatedText }));
+            else { console.error("No content in API response", result); alert("حدث خطأ أثناء إنشاء الوصف."); }
+        } catch (error) { console.error("Error calling Gemini API:", error); alert("حدث خطأ بالاتصال بالخادم.");
+        } finally { setIsGenerating(false); }
+    };
     
-    // ** دالة السحب والتكبير المحصنة ضد الأخطاء **
     const updateTaskPosition = useCallback((e) => {
         const event = e.touches ? e.touches[0] : e;
         if (!interactionRef.current.task || !gridRef.current) return;
@@ -121,21 +135,13 @@ export default function App() {
             const targetDay = view === 'weekly' ? currentDayIndex : currentDay;
             const snappedHour = Math.max(0, Math.min(24 - taskToUpdate.duration, currentHour));
 
-            setTasks(prevTasks => prevTasks.map(t => 
-                t.id === taskToUpdate.id 
-                    ? { ...t, startHour: snappedHour, day: targetDay } 
-                    : t
-            ));
+            setTasks(prevTasks => prevTasks.map(t => t.id === taskToUpdate.id ? { ...t, startHour: snappedHour, day: targetDay } : t));
         } else if (interactionRef.current.type === 'resize') {
             const newEndHour = Math.max(taskToUpdate.startHour + 0.25, currentHour + 0.25);
             const newDuration = Math.round((newEndHour - taskToUpdate.startHour) * 4) / 4;
             const finalDuration = Math.max(0.25, Math.min(24 - taskToUpdate.startHour, newDuration));
             
-            setTasks(prevTasks => prevTasks.map(t => 
-                t.id === taskToUpdate.id 
-                    ? { ...t, duration: finalDuration } 
-                    : t
-            ));
+            setTasks(prevTasks => prevTasks.map(t => t.id === taskToUpdate.id ? { ...t, duration: finalDuration } : t));
         }
     }, [view, currentDay]);
 
@@ -162,9 +168,9 @@ export default function App() {
     const currentTimePosition = (currentTime.getHours() + currentTime.getMinutes() / 60) * HOUR_HEIGHT_IN_REM;
 
     return (
-        <div dir="rtl" className="min-h-screen flex flex-col font-sans bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+        <div dir="rtl" className="h-screen flex flex-col font-sans bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 overflow-hidden">
             <PwaMetaTags />
-            <header className="flex items-center justify-between p-2 md:p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-20">
+            <header className="flex-shrink-0 flex items-center justify-between p-2 md:p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm z-20">
                 <h1 className="text-lg md:text-2xl font-bold text-blue-600 dark:text-blue-400">منظم المهام</h1>
                 <div className="flex items-center gap-1 md:gap-3">
                     {installPrompt && (<button onClick={handleInstallClick} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><InstallIcon /></button>)}
@@ -178,51 +184,51 @@ export default function App() {
                 </div>
             </header>
 
-            <div className="sm:hidden bg-gray-100 dark:bg-gray-800 p-2 flex justify-center border-b border-gray-200 dark:border-gray-700">
+            <div className="sm:hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800 p-2 flex justify-center border-b border-gray-200 dark:border-gray-700">
                  <select onChange={(e) => setCurrentDay(parseInt(e.target.value))} value={currentDay} className="bg-white dark:bg-gray-700 rounded-full px-4 py-1 shadow text-sm">
                      {days.map((day, i) => <option key={i} value={i}>{day}</option>)}
                  </select>
             </div>
 
-            <main className="flex-grow p-1 sm:p-2 md:p-4 overflow-hidden">
-                <div className="relative flex h-full">
-                    <div className="w-12 md:w-16 flex-shrink-0">
-                         <div className="h-10"></div>
-                         {hours.map(hour => (<div key={hour} className="h-16 flex items-start justify-center text-xs text-gray-500 dark:text-gray-400 pt-1">{hour}</div>))}
-                    </div>
-                    
-                    <div className="flex-grow overflow-x-auto relative">
-                        <div ref={gridRef} className="grid min-w-[700px] md:min-w-0" style={{ gridTemplateColumns: view === 'weekly' ? 'repeat(7, 1fr)' : '1fr' }}>
-                            {(view === 'weekly' ? days : [days[currentDay]]).map((day, dayIndex) => {
-                                const actualDayIndex = view === 'weekly' ? dayIndex : currentDay;
-                                const isToday = actualDayIndex === today;
-                                return (
-                                    <div key={day} className={`relative border-l border-gray-100 dark:border-gray-800 ${isToday ? 'bg-blue-50/50 dark:bg-gray-800/50' : ''}`}>
-                                        <div className={`sticky top-0 z-10 text-center font-semibold py-2 h-10 border-b border-gray-200 dark:border-gray-700 text-sm md:text-base ${isToday ? 'text-blue-600 dark:text-blue-400' : ''}`}>{day}</div>
-                                        <div className="relative">
-                                            {hours.map((_, hourIndex) => (<div key={hourIndex} onDoubleClick={() => openModal(null, actualDayIndex, hourIndex)} className="relative h-16 border-t border-dashed border-gray-200 dark:border-gray-600 hover:bg-blue-100/50 dark:hover:bg-gray-700/50">
-                                                <div className="absolute top-1/4 w-full border-b border-dashed border-gray-200/50 dark:border-gray-700/50"></div>
-                                                <div className="absolute top-1/2 w-full border-b border-dashed border-gray-200/75 dark:border-gray-700/75"></div>
-                                                <div className="absolute top-3/4 w-full border-b border-dashed border-gray-200/50 dark:border-gray-700/50"></div>
-                                            </div>))}
-                                            {tasks.filter(t => t && t.day === actualDayIndex).map(task => (
-                                                <div key={task.id} onDoubleClick={(e) => { e.stopPropagation(); openModal(task); }} onMouseDown={(e) => startInteraction(e, task, 'move')} onTouchStart={(e) => startInteraction(e, task, 'move')} onMouseMove={(e) => showTooltip(e, task)} onMouseLeave={hideTooltip}
-                                                    className={`${TASK_COLORS[task.color]} absolute right-0 left-0 mx-1 rounded-lg p-2 text-white shadow-md cursor-pointer select-none transition-all duration-100 ease-in-out overflow-hidden group`}
-                                                    style={{ top: `${task.startHour * HOUR_HEIGHT_IN_REM}rem`, height: `${task.duration * HOUR_HEIGHT_IN_REM}rem` }}>
-                                                    <div className="flex flex-col h-full"><p className="font-bold text-sm truncate">{task.title}</p><p className="text-xs truncate opacity-80 whitespace-pre-wrap">{task.description}</p><div className="mt-auto pt-2"><div className="w-full bg-white/20 rounded-full h-1.5"><div className="bg-white rounded-full h-1.5" style={{ width: `${task.progress}%` }}></div></div></div></div>
-                                                    <div onMouseDown={(e) => startInteraction(e, task, 'resize')} onTouchStart={(e) => startInteraction(e, task, 'resize')} className="absolute bottom-0 left-0 w-full h-4 cursor-ns-resize flex items-end justify-center opacity-0 group-hover:opacity-100 transition-opacity"><div className="w-8 h-1 bg-white/50 rounded-full"></div></div>
+            <main className="flex-grow flex relative">
+                <div className="w-12 md:w-16 flex-shrink-0">
+                     <div className="h-10"></div>
+                     {hours.map(hour => (<div key={hour} className="h-16 flex items-start justify-center text-xs text-gray-500 dark:text-gray-400 pt-1">{hour}</div>))}
+                </div>
+                
+                <div className="flex-grow overflow-y-auto overflow-x-auto">
+                    <div ref={gridRef} className="relative grid min-w-[700px] md:min-w-0" style={{ gridTemplateColumns: view === 'weekly' ? 'repeat(7, 1fr)' : '1fr' }}>
+                        {(view === 'weekly' ? days : [days[currentDay]]).map((day, dayIndex) => {
+                            const actualDayIndex = view === 'weekly' ? dayIndex : currentDay;
+                            const isToday = actualDayIndex === today;
+                            return (
+                                <div key={day} className={`relative border-l border-gray-100 dark:border-gray-800 ${isToday ? 'bg-blue-50/50 dark:bg-gray-800/50' : ''}`}>
+                                    <div className={`sticky top-0 z-10 text-center font-semibold py-2 h-10 border-b border-gray-200 dark:border-gray-700 text-sm md:text-base ${isToday ? 'text-blue-600 dark:text-blue-400' : ''}`}>{day}</div>
+                                    <div className="relative">
+                                        {hours.map((_, hourIndex) => (<div key={hourIndex} onDoubleClick={() => openModal(null, actualDayIndex, hourIndex)} className="relative h-16 border-t border-dashed border-gray-200 dark:border-gray-600 hover:bg-blue-100/50 dark:hover:bg-gray-700/50">
+                                            <div className="absolute top-1/4 w-full border-b border-dashed border-gray-200/50 dark:border-gray-700/50"></div>
+                                            <div className="absolute top-1/2 w-full border-b border-dashed border-gray-200/75 dark:border-gray-700/75"></div>
+                                            <div className="absolute top-3/4 w-full border-b border-dashed border-gray-200/50 dark:border-gray-700/50"></div>
+                                        </div>))}
+                                        {tasks.filter(t => t && t.day === actualDayIndex).map(task => (
+                                            <div key={task.id} onDoubleClick={(e) => { e.stopPropagation(); openModal(task); }} onMouseDown={(e) => startInteraction(e, task, 'move')} onTouchStart={(e) => startInteraction(e, task, 'move')} onMouseMove={(e) => showTooltip(e, task)} onMouseLeave={hideTooltip}
+                                                className={`${TASK_COLORS[task.color]} absolute right-0 left-0 mx-1 rounded-lg p-2 text-white shadow-md cursor-pointer select-none transition-all duration-100 ease-in-out overflow-hidden group`}
+                                                style={{ top: `${task.startHour * HOUR_HEIGHT_IN_REM}rem`, height: `${task.duration * HOUR_HEIGHT_IN_REM}rem` }}>
+                                                <div className="flex flex-col h-full"><p className="font-bold text-sm truncate">{task.title}</p><p className="text-xs truncate opacity-80 whitespace-pre-wrap">{task.description}</p><div className="mt-auto pt-2"><div className="w-full bg-white/20 rounded-full h-1.5"><div className="bg-white rounded-full h-1.5" style={{ width: `${task.progress}%` }}></div></div></div></div>
+                                                <div onMouseDown={(e) => startInteraction(e, task, 'resize')} onTouchStart={(e) => startInteraction(e, task, 'resize')} className="absolute bottom-0 left-0 w-full h-6 cursor-ns-resize flex items-end justify-center opacity-0 group-hover:opacity-100 transition-opacity"><div className="w-8 h-1 bg-white/50 rounded-full mb-1"></div></div>
+                                            </div>
+                                        ))}
+                                        {isToday && (
+                                            <div className="absolute top-0 right-0 left-0 pointer-events-none z-10" style={{ transform: `translateY(${currentTimePosition}rem)` }}>
+                                                <div className="relative h-px bg-red-500">
+                                                    <div className="absolute -right-1 -top-1 w-2.5 h-2.5 bg-red-500 rounded-full"></div>
                                                 </div>
-                                            ))}
-                                        </div>
+                                            </div>
+                                        )}
                                     </div>
-                                );
-                            })}
-                        </div>
-                        <div className="absolute top-10 right-0 left-0 pointer-events-none z-10" style={{ transform: `translateY(${currentTimePosition}rem)` }}>
-                             <div className="relative h-px bg-red-500">
-                                 <div className="absolute -right-1 -top-1 w-2.5 h-2.5 bg-red-500 rounded-full"></div>
-                             </div>
-                        </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </main>
